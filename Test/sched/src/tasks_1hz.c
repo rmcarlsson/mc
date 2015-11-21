@@ -6,8 +6,10 @@
  */
 #include <stdint.h>
 
+
 void exec_one_hz()
 {
   int16_t ret = pid_controller(10, 10);
+  float temp = get_temp();
 }
 
