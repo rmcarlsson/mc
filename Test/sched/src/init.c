@@ -12,5 +12,6 @@
 void init()
 {
   pid_init(1, 1, 1);
+  init_power(1500);
 }
 

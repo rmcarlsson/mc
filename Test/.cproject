@@ -20,7 +20,12 @@
 							<option id="cdt.managedbuild.option.gnu.cross.prefix.2102692146" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" value="arm-linux-gnueabihf-" valueType="string"/>
 							<option id="cdt.managedbuild.option.gnu.cross.path.640087356" name="Path" superClass="cdt.managedbuild.option.gnu.cross.path" value="C:\SysGCC\Raspberry_wheezy_nosysroot\bin" valueType="string"/>
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.395582189" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
-							<builder autoBuildTarget="all" buildPath="${workspace_loc:/Test}/Debug" cleanBuildTarget="clean" id="org.eclipse.cdt.build.core.internal.builder.1968477855" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="org.eclipse.cdt.build.core.internal.builder"/>
+							<builder autoBuildTarget="all" buildPath="${workspace_loc:/Test}/Debug" cleanBuildTarget="clean" id="org.eclipse.cdt.build.core.internal.builder.1968477855" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="org.eclipse.cdt.build.core.internal.builder">
+								<outputEntries>
+									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Debug"/>
+									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Release"/>
+								</outputEntries>
+							</builder>
 							<tool command="gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.cross.c.compiler.824206237" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler">
 								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.103801076" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.915782405" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated"/>
@@ -31,6 +36,9 @@
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1977180633" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="_POSIX_C_SOURCE=199309L"/>
 								</option>
+								<option id="gnu.c.compiler.option.misc.verbose.2129416498" name="Verbose (-v)" superClass="gnu.c.compiler.option.misc.verbose" useByScannerDiscovery="false" value="false" valueType="boolean"/>
+								<option id="gnu.c.compiler.option.warnings.pedantic.1878654073" name="Pedantic (-pedantic)" superClass="gnu.c.compiler.option.warnings.pedantic" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="gnu.c.compiler.option.warnings.extrawarn.1197368697" name="Extra warnings (-Wextra)" superClass="gnu.c.compiler.option.warnings.extrawarn" useByScannerDiscovery="false" value="true" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1298779478" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.626553989" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler">
@@ -38,11 +46,7 @@
 								<option id="gnu.cpp.compiler.option.debugging.level.1651894630" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 							</tool>
 							<tool command="gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.gnu.cross.c.linker.525322567" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker">
-								<option id="gnu.c.link.option.paths.101184812" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;C:\SysGCC\Raspberry_wheezy_nosysroot\arm-linux-gnueabihf\lib&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;C:\SysGCC\Raspberry_wheezy_nosysroot\arm-linux-gnueabihf\sysroot\lib&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;C:\SysGCC\Raspberry_wheezy_nosysroot\arm-linux-gnueabihf\sysroot\usr\lib&quot;"/>
-								</option>
+								<option id="gnu.c.link.option.paths.101184812" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths"/>
 								<option id="gnu.c.link.option.libs.405340665" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="rt"/>
 								</option>
@@ -54,12 +58,15 @@
 							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.linker.1329121839" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker"/>
 							<tool id="cdt.managedbuild.tool.gnu.cross.archiver.701689703" name="Cross GCC Archiver" superClass="cdt.managedbuild.tool.gnu.cross.archiver"/>
 							<tool command="as" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.tool.gnu.cross.assembler.1237774869" name="Cross GCC Assembler" superClass="cdt.managedbuild.tool.gnu.cross.assembler">
+								<option id="gnu.both.asm.option.include.paths.2035202784" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="../Test/Test/interfaces/reg"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1965139585" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -113,6 +120,9 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
+					<sourceEntries>
+						<entry excluding="drv|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+					</sourceEntries>
 				</configuration>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>

@@ -6,10 +6,13 @@
  */
 #include <stdint.h>
 
+#include "pid.h"
 
 void exec_one_hz()
 {
-  int16_t ret = pid_controller(10, 10);
   float temp = get_temp();
+  int16_t ret = pid_controller(temp, 10);
+  set_power_level((ret*100)/INT16_MAX);
+  exec_heater();
 }
 

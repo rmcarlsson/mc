@@ -145,6 +145,8 @@ int16_t pid_controller(int16_t reference, int16_t process_value)
     ret = -MAX_INT;
   }
 
+  printf("PID controller output is %d\n", ret);
+
   return((int16_t)ret);
 }
 
