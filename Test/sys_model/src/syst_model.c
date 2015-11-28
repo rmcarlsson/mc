@@ -23,15 +23,35 @@ double y = AMBIENT_TEMPERATURE;
 const double weight_g = 8000.0; /* Unit [g] */
 const double specific_heat = 4.1855; /* Unit [J/g*K] - Water */
 const double tR_hob_kettle = 1.0; /* Unit [K/W] */
+double tR_kettle_amb; /* Unit [K/W] */
 const double T = 1;
 
 #define RC (tR_hob_kettle * specific_heat * weight_g)
 #define POWER (-T/RC)
 
 void
-model_exec(double energy) {
+init_model()
+{
+	double temp_drop = 1; /* Unit [K] */
+	double t_drop = 60*3; /* Unit [s], like 3 minutes, sortof */
+
+	/* Powerloss at 70 degrees C */
+	 double p =  (specific_heat * weight_g * temp_drop)/t_drop;
+	 tR_kettle_amb = (70 - AMBIENT_TEMPERATURE)/p;
+
+}
+
+
+void
+exec_model(double energy) {
 
 	y = (exp(POWER) * y) + ((1 - exp(POWER)) * energy);
+
+	/* Reduce energy due to ambient temperature	 */
+
+	double p_heatloss = (y - AMBIENT_TEMPERATURE) / tR_kettle_amb;
+	y = y - (((p_heatloss * T)/(specific_heat))/weight_g);
+
 }
 
 float get_model_temp()
