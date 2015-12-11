@@ -7,6 +7,8 @@
 
 #include <stdbool.h>
 
+#include "pid_atune.h"
+
 void
 FinishUp ();
 
@@ -31,7 +33,7 @@ double outputStart;
 double Ku, Pu;
 
 
-PID_ATune (double* Input, double* Output)
+void PID_ATune (double* Input, double* Output)
 {
   input = Input;
   output = Output;
@@ -39,8 +41,8 @@ PID_ATune (double* Input, double* Output)
   noiseBand = 0.5;
   running = false;
   oStep = 30;
-  SetLookbackSec (10);
-  lastTime = millis ();
+  SetLookbackSec(10);
+  lastTime = 0;
 
 }
 
@@ -60,7 +62,7 @@ Runtime ()
       FinishUp ();
       return 1;
     }
-  unsigned long now = millis ();
+  unsigned long now = lastTime + sampleTime;
 
   if ((now - lastTime) < sampleTime)
     return false;

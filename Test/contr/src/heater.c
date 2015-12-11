@@ -7,6 +7,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <time.h>
 
 #include "global_types.h"
 #include "gpio.h"
@@ -17,8 +18,8 @@
 /*
  * Private date
  */
-static power_t _curr_power;
-static power_t _power_max;
+power_t _curr_power;
+power_t _power_max;
 
 #define POUT 23 /* P1-18 */
 #define OUT 1
@@ -57,16 +58,31 @@ set_power_level (percent_t power_percent)
 #define T (1)
   exec_model(_curr_power * T);
 #endif /* defined(SIMULATED) */
-
+  _curr_power = 5;
 }
 
 void
-exec_heater ()
+heater_exec ()
 {
-  static int repeat = 0;
+  struct timespec sp;
+  struct timespec rem;
 
-  gpio_write_val(repeat % 2);
-  repeat++;
+
+  if (_curr_power > 0)
+    gpio_write_val(1);
+
+  if (_curr_power < 95)
+    {
+      long ms = (5000 * _curr_power)/MAX_PERCENT;
+      sp.tv_nsec = (ms % 1000) * 1000;
+      sp.tv_sec = ms/1000;
+      printf("s = %lu, ns = %lu\n", sp.tv_sec, sp.tv_nsec);
+      nanosleep(&sp, &rem);
+      gpio_write_val(0);
+    }
+
+
+
 
 }
 

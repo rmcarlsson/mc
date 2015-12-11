@@ -9,7 +9,7 @@
 #define INTERFACES_REG_PID_ATUNE_H_
 
 //commonly used functions **************************************************************************
-PID_ATune (double*, double*); // * Constructor.  links the Autotune to a given PID
+void PID_ATune (double* input, double* output); // * Constructor.  links the Autotune to a given PID
 
 int
 Runtime ();	// * Similar to the PID Compue function, returns non 0 when done

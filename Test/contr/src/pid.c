@@ -37,7 +37,7 @@ bool inAuto;
  *    The parameters specified here are those for for which we can't set up
  *    reliable defaults, so we need to have the user set them.
  ***************************************************************************/
-PID (double* Input, double* Output, double* Setpoint, double Kp, double Ki,
+void PID (double* Input, double* Output, double* Setpoint, double Kp, double Ki,
      double Kd, int ControllerDirection)
 {
 
@@ -54,7 +54,6 @@ PID (double* Input, double* Output, double* Setpoint, double Kp, double Ki,
   SetControllerDirection (ControllerDirection);
   SetTunings (Kp, Ki, Kd);
 
-  lastTime = millis () - SampleTime;
 }
 
 /* Compute() **********************************************************************
@@ -63,15 +62,11 @@ PID (double* Input, double* Output, double* Setpoint, double Kp, double Ki,
  *   pid Output needs to be computed.  returns true when the output is computed,
  *   false when nothing has been done.
  **********************************************************************************/
-bool
+void
 Compute ()
 {
   if (!inAuto)
-    return false;
-  unsigned long now = millis ();
-  unsigned long timeChange = (now - lastTime);
-  if (timeChange >= SampleTime)
-    {
+    return;
       /*Compute all the working error variables*/
       double input = *myInput;
       double error = *mySetpoint - input;
@@ -93,11 +88,6 @@ Compute ()
 
       /*Remember some variables for next time*/
       lastInput = input;
-      lastTime = now;
-      return true;
-    }
-  else
-    return false;
 }
 
 /* SetTunings(...)*************************************************************

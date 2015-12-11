@@ -93,12 +93,12 @@ wait_period (struct periodic_info *info)
 }
 
 static void *
-base_thread_10ms (void *arg)
+base_thread_5s (void *arg)
 {
   (void) (arg);
   struct periodic_info info;
 
-  make_periodic (1000000, &info);
+  make_periodic (5000000, &info);
   while (1)
     {
       exec_one_hz ();
@@ -107,10 +107,27 @@ base_thread_10ms (void *arg)
   return NULL;
 }
 
+
+static void *
+base_thread_5s_pwm (void *arg)
+{
+  (void) (arg);
+  struct periodic_info info;
+
+  make_periodic (5000000, &info);
+  while (1)
+    {
+      heater_exec();
+      wait_period (&info);
+    }
+  return NULL;
+}
+
 int
 main (int argc, char* argv[])
 {
-  pthread_t pt;
+  pthread_t pt1;
+  pthread_t pt2;
   sigset_t alarm_sig;
   int i;
 
@@ -127,9 +144,10 @@ main (int argc, char* argv[])
 
   init ();
 
-  pthread_create (&pt, NULL, base_thread_10ms, NULL);
+  pthread_create (&pt1, NULL, base_thread_5s, NULL);
+  pthread_create (&pt2, NULL, base_thread_5s_pwm, NULL);
 
-  (void)pthread_join (pt, NULL);
+  (void)pthread_join (pt1, NULL);
   return 0;
 }
 
