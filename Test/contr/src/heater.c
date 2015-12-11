@@ -9,6 +9,7 @@
 #include <stdio.h>
 
 #include "global_types.h"
+#include "gpio.h"
 #if defined(SIMULATED)
 #include "sys_model.h"
 #endif
@@ -23,25 +24,12 @@ static power_t _power_max;
 #define OUT 1
 
 void
-init_power (percent_t max_power)
+init_heater (percent_t max_power)
 {
   _power_max = max_power;
-
 #if defined(SIMULATED)
   init_model();
-#else
-  /*
-   * Export digital pin for "slow-PWM"
-   */
-  if (-1 == GPIOExport (POUT))
-    assert (0);
-
-  /*
-   * Set GPIO directions
-   */
-  if (-1 == GPIODirection (POUT, OUT))
-    assert (0);
-#endif /* defined(SIMULATED) */
+#endif
 
 }
 
@@ -77,8 +65,7 @@ exec_heater ()
 {
   static int repeat = 0;
 
-  if (-1 == GPIOWrite(POUT, repeat % 2))
-    assert(0);
+  gpio_write_val(repeat % 2);
   repeat++;
 
 }

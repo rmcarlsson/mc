@@ -25,8 +25,6 @@ get_temp ()
 temperature_t
 get_temp ()
 {
-  DIR *dir;
-  struct dirent *dirent;
   char devPath[128]; // Path to device
   char buf[256];     // Data from device
   char tmpData[6];   // Temp C * 1000 reported by device

@@ -10,7 +10,7 @@
 #ifndef INTERFACES_REG_GLOBAL_TYPES_H_
 #define INTERFACES_REG_GLOBAL_TYPES_H_
 
-typedef uint8_t percent_t;
+typedef uint16_t percent_t;
 #define MAX_PERCENT (percent_t)(100)
 #define MIN_PERCENT (percent_t)(0)
 

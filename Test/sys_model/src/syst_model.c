@@ -10,6 +10,8 @@
 #include <float.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdio.h>
+
 
 #include "global_types.h"
 
@@ -33,6 +35,9 @@ const double T = 1;
 #define POWER (-T/RC)
 
 
+
+
+
 double
 generate_noise ()
 {
@@ -52,7 +57,7 @@ generate_noise ()
 	}
 
       /* <########## RETURN ##########> */
-      printf("Someone ist stiring, dropping %f.3 C\n", (stiring_time / 2));
+      printf("Someone ist stiring, dropping %d C\n", (stiring_time / 2));
       return stiring_time / 4;
     }
 
@@ -103,47 +108,8 @@ exec_model (double energy)
       last_y = y;
     }
 
-  model_analytics();
-
-
 }
 
-static double y_max = DBL_MIN;
-static double y_min = DBL_MAX;
-
-void
-model_analytics ()
-{
-  static int16_t iv = 0;
-#define IV_PERIOD (100000)
-  static bool tune = true;
-  static int max_ch = 0;
-  static int min_ch = 0;
-
-  if (y > y_max)
-    {
-      y_max = y;
-      max_ch++;
-    }
-  if (y < y_min)
-    {
-      y_min = y;
-      min_ch++;
-    }
-
-  if (( iv++ > IV_PERIOD) && tune)
-    {
-      if (max_ch > 10)
-	tune = false;
-      pid_set_p (1);
-      iv = 0;
-      max_ch = 0;
-      min_ch = 0;
-      y_max = DBL_MIN;
-      y_min = DBL_MAX;
-    }
-
-}
 
 temperature_t
 get_temp_model ()

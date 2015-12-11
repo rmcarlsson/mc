@@ -6,6 +6,7 @@
  */
 
 #include "pid.h"
+#include "gpio.h"
 #include "sys_model.h"
 
 
@@ -14,7 +15,9 @@ void init()
 {
   pid_init(100, 0, 0);
 #if !defined(SIMULATED)
-  init_power(1500);
+  init_heater(1500);
 #endif
+  gpio_init();
+
 }
 
