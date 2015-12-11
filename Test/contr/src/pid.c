@@ -28,6 +28,8 @@
  * $Date: 2006-02-16 12:46:13 +0100 (to, 16 feb 2006) $
  *****************************************************************************/
 
+#include <stdio.h>
+
 #include "pid.h"
 
 /*
@@ -87,9 +89,16 @@ void pid_init(int16_t p_factor, int16_t i_factor, int16_t d_factor)
   // Limits to avoid overflow
   _pid.maxError = MAX_INT / (_pid.P_Factor + 1);
   _pid.maxSumError = MAX_I_TERM / (_pid.I_Factor + 1);
+
+
 }
 
-
+void
+pid_set_p (int16_t p_factor_inc)
+{
+  _pid.P_Factor = p_factor_inc;
+  printf("Increasing P to %d\n", _pid.P_Factor);
+}
 
 /*! \brief PID control algorithm.
  *
@@ -141,11 +150,9 @@ int16_t pid_controller(int16_t reference, int16_t process_value)
   if(ret > MAX_INT){
     ret = MAX_INT;
   }
-  else if(ret < -MAX_INT){
-    ret = -MAX_INT;
+  else if(ret < 0){
+    ret = 0;
   }
-
-  printf("PID controller output is %d\n", ret);
 
   return((int16_t)ret);
 }

@@ -12,7 +12,16 @@
 #include <unistd.h>
 
 #include "global_types.h"
+#include "sys_model.h"
 
+#if defined(SIMULATED)
+temperature_t
+get_temp ()
+{
+  return (temperature_t) get_temp_model ();
+
+}
+#else
 temperature_t
 get_temp ()
 {
@@ -41,10 +50,12 @@ get_temp ()
       strncpy (tmpData, strstr (buf, "t=") + 2, 5);
       tempC = strtof (tmpData, NULL);
       printf ("Device: %s  - ", temp_dir);
-      printf ("Temp: %.3f C  ", tempC / 1000);
+      printf ("Temp: %.3f C  \n", tempC / 1000);
     }
   close (fd);
 
-  return (temperature_t)(tempC);
+  return (temperature_t)(tempC/1000);
 
 }
+#endif /* defined(SIMULATED) */
+
