@@ -58,7 +58,7 @@ set_power_level (percent_t power_percent)
 #define T (1)
   exec_model(_curr_power * T);
 #endif /* defined(SIMULATED) */
-  _curr_power = 5;
+
 }
 
 void

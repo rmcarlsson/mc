@@ -18,8 +18,8 @@
 #include "temp.h"
 
 double i = 20;
-double o = 80;
-double setpoint = 24;
+double o = 20;
+double setpoint = 70;
 int tuning = 0;
 
 
@@ -99,18 +99,20 @@ control_init ()
 {
 
   double kp = 2, ki = 0.5, kd = 2;
+
   bool val_ok = get_pid_params(&kp, &ki, &kd);
 
-  double aTuneStep = 50, aTuneNoise = 1;
+  if (val_ok)
+    tuning = false;
+
+  double aTuneStep = 3, aTuneNoise = 1;
   unsigned int aTuneLookBack = 500;
 
-  if (!val_ok)
-    {
       PID_ATune (&i, &o);
       SetNoiseBand (aTuneNoise);
       SetOutputStep (aTuneStep);
       SetLookbackSec ((int) aTuneLookBack);
-    }
+
   PID (&i, &o, &setpoint, kp, ki, kd, DIRECT);
   SetSampleTime (5000);
   SetOutputLimits (0, 100);
@@ -122,6 +124,7 @@ int
 control_exec ()
 {
 
+  static uint16_t last_o = 0;
   i = get_temp ();
 
   if (tuning == 0)
@@ -143,6 +146,11 @@ control_exec ()
     set = 0;
   else
     set = (uint16_t) (o);
+
+  if (set != last_o )
+    printf("Power changed %d\n", set);
+  last_o = set;
+
 
   return set;
 }

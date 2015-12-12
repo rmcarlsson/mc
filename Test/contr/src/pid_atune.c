@@ -7,6 +7,7 @@
 
 #include <stdbool.h>
 #include <math.h>
+#include <stdio.h>
 
 #include "pid_atune.h"
 
@@ -41,7 +42,7 @@ void PID_ATune (double* Input, double* Output)
   controlType = 0; //default to PI
   noiseBand = 0.5;
   running = false;
-  oStep = 30;
+  oStep = 3;
   SetLookbackSec(10);
   lastTime = 0;
 
@@ -166,6 +167,11 @@ FinishUp ()
   //we can generate tuning parameters!
   Ku = 4 * (2 * oStep) / ((absMax - absMin) * 3.14159);
   Pu = (double) (peak1 - peak2) / 1000;
+
+  printf("Tuning done.\n");
+  printf("=======================================\n\n");
+  printf(" Ku = %lf\n", Ku);
+  printf(" Pu = %lf\n", Pu);
 }
 
 double
