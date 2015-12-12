@@ -6,6 +6,7 @@
  */
 
 #include <stdbool.h>
+#include <math.h>
 
 #include "pid_atune.h"
 
@@ -64,8 +65,6 @@ Runtime ()
     }
   unsigned long now = lastTime + sampleTime;
 
-  if ((now - lastTime) < sampleTime)
-    return false;
   lastTime = now;
   double refVal = *input;
   justevaled = true;
@@ -146,8 +145,8 @@ Runtime ()
 
   if (justchanged && peakCount > 2)
     { //we've transitioned.  check if we can autotune based on the last peaks
-      double avgSeparation = (abs (peaks[peakCount - 1] - peaks[peakCount - 2])
-	  + abs (peaks[peakCount - 2] - peaks[peakCount - 3])) / 2;
+      double avgSeparation = (fabs (peaks[peakCount - 1] - peaks[peakCount - 2])
+	  + fabs (peaks[peakCount - 2] - peaks[peakCount - 3])) / 2;
       if (avgSeparation < 0.05 * (absMax - absMin))
 	{
 	  FinishUp ();

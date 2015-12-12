@@ -5,6 +5,8 @@
  *      Author: rmcar
  */
 
+#include "global_types.h"
+
 #ifndef INTERFACES_REG_SYS_MODEL_H_
 #define INTERFACES_REG_SYS_MODEL_H_
 

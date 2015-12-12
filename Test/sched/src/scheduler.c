@@ -33,6 +33,7 @@
 #include <pthread.h>
 #include <unistd.h>
 
+#include "heater.h"
 #include "tasks.h"
 
 struct periodic_info
