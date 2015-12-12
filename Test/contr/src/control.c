@@ -22,60 +22,13 @@ double o = 80;
 double setpoint = 24;
 int tuning = 0;
 
-void
-control_init ()
-{
 
-  double kp = 2, ki = 0.5, kd = 2;
-
-  double aTuneStep = 50, aTuneNoise = 1;
-  unsigned int aTuneLookBack = 500;
-
-  PID_ATune (&i, &o);
-  SetNoiseBand (aTuneNoise);
-  SetOutputStep (aTuneStep);
-  SetLookbackSec ((int) aTuneLookBack);
-
-  PID (&i, &o, &setpoint, kp, ki, kd, DIRECT);
-  SetSampleTime (5000);
-  SetOutputLimits (0, 100);
-  SetMode (AUTOMATIC);
-
-}
-
-int
-control_exec ()
-{
-
-  i = get_temp ();
-
-  if (tuning == 0)
-    {
-      tuning = Runtime ();
-      if (tuning != 0)
-	{
-	  SetTunings (pidat_GetKp (), pidat_GetKi (), pidat_GetKd ());
-	}
-    }
-  else
-    { //we're done, set the tuning parameters
-      Compute ();
-    }
-
-  int set = 0;
-  if (o < 0)
-    set = 0;
-  else
-    set = (uint16_t) (o);
-
-  return set;
-}
 
 bool
-get_pid_params (double* kp, double* ki, double* kd)
+get_pid_params(double* kp, double* ki, double* kd)
 {
 
-  char filename[] = "pid.par";
+  const char filename[] = "pid.par";
   char line[100];
   size_t len = 100;
   bool ret = false;
@@ -123,7 +76,6 @@ save_pid_params (double kp, double ki, double kd)
 
   char filename[] = "pid.par";
   FILE* fp;
-  char buf[256];
 
   fp = fopen (filename, "w");
   if (fp == NULL)
@@ -131,16 +83,68 @@ save_pid_params (double kp, double ki, double kd)
       perror ("Couldn't open the pid.par.");
       assert(0);
     }
-  sprintf (buf, "%.5lf\n", kp);
-  fwrite (buf, sizeof(buf), 1, fp);
+  fprintf (fp, "%.5lf\n", kp);
 
-  sprintf (buf, "%.5lf\n", ki);
-  fwrite (buf, sizeof(buf), 1, fp);
+  fprintf (fp, "%.5lf\n", ki);
 
-  sprintf (buf, "%.5lf\n", kd);
-  fwrite (buf, sizeof(buf), 1, fp);
+  fprintf (fp, "%.5lf\n", kd);
 
   (void)fclose (fp);
 
 }
+
+
+void
+control_init ()
+{
+
+  double kp = 2, ki = 0.5, kd = 2;
+  bool val_ok = get_pid_params(&kp, &ki, &kd);
+
+  double aTuneStep = 50, aTuneNoise = 1;
+  unsigned int aTuneLookBack = 500;
+
+  if (!val_ok)
+    {
+      PID_ATune (&i, &o);
+      SetNoiseBand (aTuneNoise);
+      SetOutputStep (aTuneStep);
+      SetLookbackSec ((int) aTuneLookBack);
+    }
+  PID (&i, &o, &setpoint, kp, ki, kd, DIRECT);
+  SetSampleTime (5000);
+  SetOutputLimits (0, 100);
+  SetMode (AUTOMATIC);
+
+}
+
+int
+control_exec ()
+{
+
+  i = get_temp ();
+
+  if (tuning == 0)
+    {
+      tuning = Runtime ();
+      if (tuning != 0)
+	{
+	  SetTunings (pidat_GetKp (), pidat_GetKi (), pidat_GetKd ());
+	  save_pid_params(pidat_GetKp(), pidat_GetKi(), pidat_GetKd());
+	}
+    }
+  else
+    { //we're done, set the tuning parameters
+      Compute ();
+    }
+
+  int set = 0;
+  if (o < 0)
+    set = 0;
+  else
+    set = (uint16_t) (o);
+
+  return set;
+}
+
 
