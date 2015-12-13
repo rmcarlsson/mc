@@ -33,9 +33,11 @@ double absMax, absMin;
 double oStep;
 double outputStart;
 double Ku, Pu;
+bool inc_state = false;
+bool dec_state = false;
 
-
-void PID_ATune (double* Input, double* Output)
+void
+PID_ATune (double* Input, double* Output)
 {
   input = Input;
   output = Output;
@@ -43,7 +45,7 @@ void PID_ATune (double* Input, double* Output)
   noiseBand = 0.5;
   running = false;
   oStep = 3;
-  SetLookbackSec(10);
+  SetLookbackSec (10);
   lastTime = 0;
 
 }
@@ -71,6 +73,7 @@ Runtime ()
   justevaled = true;
   if (!running)
     { //initialize working variables the first time around
+      printf ("Initializing new tuning run\n");
       peakType = 0;
       peakCount = 0;
       justchanged = false;
@@ -92,10 +95,26 @@ Runtime ()
   //oscillate the output base on the input's relation to the setpoint
 
   if (refVal > setpoint + noiseBand)
-    *output = outputStart - oStep;
+    {
+      *output = outputStart - oStep;
+      if (!dec_state)
+	{
+	  printf ("Ref %lf, set val %lf, step %lf, peak count %d\n", refVal,
+		  *output, oStep, peakCount);
+	  dec_state = true;
+	  inc_state = false;
+	}
+    }
   else if (refVal < setpoint - noiseBand)
-    *output = outputStart + oStep;
-
+    {
+      *output = outputStart + oStep;
+      if (!inc_state)
+	{
+	  printf ("Ref %lf, set val %lf, step %lf\n", refVal, *output, oStep);
+	  inc_state = true;
+	  dec_state = false;
+	}
+    }
   //bool isMax=true, isMin=true;
   isMax = true;
   isMin = true;
@@ -168,10 +187,10 @@ FinishUp ()
   Ku = 4 * (2 * oStep) / ((absMax - absMin) * 3.14159);
   Pu = (double) (peak1 - peak2) / 1000;
 
-  printf("Tuning done.\n");
-  printf("=======================================\n\n");
-  printf(" Ku = %lf\n", Ku);
-  printf(" Pu = %lf\n", Pu);
+  printf ("Tuning done.\n");
+  printf ("=======================================\n\n");
+  printf (" Ku = %lf\n", Ku);
+  printf (" Pu = %lf\n", Pu);
 }
 
 double

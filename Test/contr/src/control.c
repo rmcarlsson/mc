@@ -12,20 +12,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <math.h>
 
 #include "pid.h"
 #include "pid_atune.h"
 #include "temp.h"
 
-double i = 20;
-double o = 20;
-double setpoint = 70;
-int tuning = 0;
-
-
-
 bool
-get_pid_params(double* kp, double* ki, double* kd)
+get_pid_params (double* kp, double* ki, double* kd)
 {
 
   const char filename[] = "pid.par";
@@ -38,13 +32,13 @@ get_pid_params(double* kp, double* ki, double* kd)
   fd = fopen (filename, "r");
   if (fd == NULL)
     {
-      perror ("Couldn't open the pid.par.");
-      return 1;
+      ret = false;
+      return ret;
     }
 
   for (int i = 0; i < 3; i++)
     {
-      char* ok = fgets(line, len, fd);
+      char* ok = fgets (line, len, fd);
       if (ok == NULL)
 	break;
       else
@@ -65,7 +59,7 @@ get_pid_params(double* kp, double* ki, double* kd)
 	    }
 	}
     }
-  (void)fclose (fd);
+  (void) fclose (fd);
 
   return ret;
 }
@@ -89,29 +83,39 @@ save_pid_params (double kp, double ki, double kd)
 
   fprintf (fp, "%.5lf\n", kd);
 
-  (void)fclose (fp);
+  (void) fclose (fp);
 
 }
 
+/* Interface data to PID controller */
+double i = 70;
+double o = 10;
+
+int tuning = 0;
 
 void
 control_init ()
 {
 
   double kp = 2, ki = 0.5, kd = 2;
+  double setpoint = 70;
 
-  bool val_ok = get_pid_params(&kp, &ki, &kd);
-
-  if (val_ok)
-    tuning = false;
-
-  double aTuneStep = 3, aTuneNoise = 1;
+  double aTuneStep = 5;
+  double aTuneNoise = 1;
   unsigned int aTuneLookBack = 500;
 
-      PID_ATune (&i, &o);
-      SetNoiseBand (aTuneNoise);
-      SetOutputStep (aTuneStep);
-      SetLookbackSec ((int) aTuneLookBack);
+  bool val_ok = get_pid_params (&kp, &ki, &kd);
+
+  if (val_ok)
+    {
+      tuning = 0;
+      printf ("No valid pid parameters found, start tuning\n");
+    }
+
+  PID_ATune (&i, &o);
+  SetNoiseBand (aTuneNoise);
+  SetOutputStep (aTuneStep);
+  SetLookbackSec ((int) aTuneLookBack);
 
   PID (&i, &o, &setpoint, kp, ki, kd, DIRECT);
   SetSampleTime (5000);
@@ -124,8 +128,14 @@ int
 control_exec ()
 {
 
-  static uint16_t last_o = 0;
+  static temperature_t last_temp = 0;
+
   i = get_temp ();
+  if (fabs (last_temp - i) > 1)
+    {
+      printf ("Temp is %lf\n", i);
+      last_temp = i;
+    }
 
   if (tuning == 0)
     {
@@ -133,7 +143,7 @@ control_exec ()
       if (tuning != 0)
 	{
 	  SetTunings (pidat_GetKp (), pidat_GetKi (), pidat_GetKd ());
-	  save_pid_params(pidat_GetKp(), pidat_GetKi(), pidat_GetKd());
+	  save_pid_params (pidat_GetKp (), pidat_GetKi (), pidat_GetKd ());
 	}
     }
   else
@@ -147,12 +157,6 @@ control_exec ()
   else
     set = (uint16_t) (o);
 
-  if (set != last_o )
-    printf("Power changed %d\n", set);
-  last_o = set;
-
-
   return set;
 }
-
 

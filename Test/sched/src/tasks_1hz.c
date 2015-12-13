@@ -20,7 +20,8 @@ void init()
 {
 
 
-control_init();
+  init_heater(100);
+  control_init();
   gpio_init();
 
 }

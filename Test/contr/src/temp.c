@@ -47,8 +47,8 @@ get_temp ()
     {
       strncpy (tmpData, strstr (buf, "t=") + 2, 5);
       tempC = strtof (tmpData, NULL);
-      printf ("Device: %s  - ", temp_dir);
-      printf ("Temp: %.3f C  \n", tempC / 1000);
+      //printf ("Device: %s  - ", temp_dir);
+      //printf ("Temp: %.3f C  \n", tempC / 1000);
     }
   close (fd);
 

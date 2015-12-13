@@ -138,6 +138,7 @@ gpio_write_val(int value)
   char path[VALUE_MAX];
 
   snprintf (path, VALUE_MAX, "/sys/class/gpio/gpio%d/value", POUT);
+  //printf ("%s\n", path);
   if (1 != write (fd_wr, &s_values_str[LOW == value ? 0 : 1], 1))
     {
       fprintf (stderr, "Failed to write value!\n");
