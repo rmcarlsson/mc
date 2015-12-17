@@ -11,5 +11,6 @@
 
 temperature_t
 get_temp ();
-
+void
+temp_exec();
 #endif /* INTERFACES_REG_TEMP_H_ */

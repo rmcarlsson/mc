@@ -10,6 +10,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <math.h>
 
 #include "global_types.h"
 #include "sys_model.h"
@@ -23,7 +24,7 @@ get_temp ()
 }
 #else
 temperature_t
-get_temp ()
+read_temp ()
 {
   char devPath[128]; // Path to device
   char buf[256];     // Data from device
@@ -32,7 +33,8 @@ get_temp ()
   ssize_t numRead;
   float tempC;
 
-  const char temp_dir[] = "22-0000001eafca";
+  //const char temp_dir[] = "22-0000001eafca";
+  const char temp_dir[] = "28-011564ddabff";
 
   sprintf (devPath, "%s/%s/w1_slave", path, temp_dir);
   // Read temp continuously
@@ -48,7 +50,7 @@ get_temp ()
       strncpy (tmpData, strstr (buf, "t=") + 2, 5);
       tempC = strtof (tmpData, NULL);
       //printf ("Device: %s  - ", temp_dir);
-      //printf ("Temp: %.3f C  \n", tempC / 1000);
+      //printf ("T =  %.3f C\n", tempC / 1000);
     }
   close (fd);
 
@@ -57,3 +59,32 @@ get_temp ()
 }
 #endif /* defined(SIMULATED) */
 
+#define N_TAPS 1
+temperature_t vec[N_TAPS];
+int16_t cnt = 0;
+
+void
+temp_exec()
+{
+  vec[cnt++] = read_temp();
+  if (cnt >= N_TAPS)
+    cnt = 0;
+
+}
+
+temperature_t
+get_temp()
+{
+  static temperature_t t_last = 0;
+  temperature_t t_avg = 0;
+  for (int i = 0; i<N_TAPS; i++ )
+    t_avg += vec[i];
+
+  if (fabs(t_last-(t_avg/N_TAPS)) > 1)
+    {
+      printf("T=%.3lf\n",(t_avg/N_TAPS) );
+      t_last = t_avg;
+    }
+
+  return (t_avg/N_TAPS);
+}

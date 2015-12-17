@@ -17,6 +17,7 @@
 #include "pid.h"
 #include "pid_atune.h"
 #include "temp.h"
+#include "control.h"
 
 bool
 get_pid_params (double* kp, double* ki, double* kd)
@@ -55,6 +56,7 @@ get_pid_params (double* kp, double* ki, double* kd)
 	    case 2:
 	      *kd = d;
 	      ret = true;
+	      printf("Read valid PID parameters, P=%.4lf, I=%.4lf, d=%.4lf\n", *kp, *ki, *kd);
 	      break;
 	    }
 	}
@@ -88,29 +90,58 @@ save_pid_params (double kp, double ki, double kd)
 }
 
 /* Interface data to PID controller */
-double i = 70;
-double o = 10;
+double i = 20;
+double o = 0;
+double setpoint = 66;
 
 int tuning = 0;
+
+void
+control_set_target(temperature_t t)
+{
+  setpoint = (double)(t);
+}
+
+
+control_state_t
+control_get_state()
+{
+#define ERROR_AT_STABLE (double)(1.5)
+  temperature_t curr = get_temp ();
+  double e = fabs(setpoint-curr);
+  if ( e < ERROR_AT_STABLE )
+    {
+      return CONTROL_STABLE;
+    }
+  else
+    return CONTROL_HEATING;
+
+}
+
+
+
 
 void
 control_init ()
 {
 
   double kp = 2, ki = 0.5, kd = 2;
-  double setpoint = 70;
 
-  double aTuneStep = 5;
+
+  double aTuneStep = 3;
   double aTuneNoise = 1;
   unsigned int aTuneLookBack = 500;
 
   bool val_ok = get_pid_params (&kp, &ki, &kd);
 
-  if (val_ok)
+  if (!val_ok)
     {
       tuning = 0;
       printf ("No valid pid parameters found, start tuning\n");
     }
+  else
+    tuning = 1;
+
 
   PID_ATune (&i, &o);
   SetNoiseBand (aTuneNoise);
@@ -128,14 +159,7 @@ int
 control_exec ()
 {
 
-  static temperature_t last_temp = 0;
-
   i = get_temp ();
-  if (fabs (last_temp - i) > 1)
-    {
-      printf ("Temp is %lf\n", i);
-      last_temp = i;
-    }
 
   if (tuning == 0)
     {

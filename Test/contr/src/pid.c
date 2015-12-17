@@ -6,6 +6,8 @@
  **********************************************************************************************/
 
 #include <stdbool.h>
+#include <stdio.h>
+#include <math.h>
 #include "pid.h"
 
 void
@@ -65,6 +67,8 @@ void PID (double* Input, double* Output, double* Setpoint, double Kp, double Ki,
 void
 Compute ()
 {
+  static double l_p, l_i, l_d = 0;
+
   if (!inAuto)
     return;
       /*Compute all the working error variables*/
@@ -79,6 +83,15 @@ Compute ()
 
       /*Compute PID Output*/
       double output = kp * error + ITerm - kd * dInput;
+      if ((fabs((kp*error) - l_p) > 2) ||
+	  (fabs(ITerm - l_i) > 1) ||
+	(fabs((kd * dInput)-l_d) > 5))
+	{
+	  printf("P=%.5lf, I=%lf, d=%lf\n", (kp*error), ITerm, (kd * dInput));
+	  l_p = (kp*error);
+	  l_i = ITerm;
+	  l_d = (kd * dInput);
+	}
 
       if (output > outMax)
 	output = outMax;

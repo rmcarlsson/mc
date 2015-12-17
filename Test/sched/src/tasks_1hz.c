@@ -11,6 +11,7 @@
 #include "temp.h"
 #include "control.h"
 #include "heater.h"
+#include "mash_profile.h"
 
 
 
@@ -23,13 +24,21 @@ void init()
   init_heater(100);
   control_init();
   gpio_init();
+  mash_init();
 
 }
 
 void exec_one_hz()
 {
 
-  int p = control_exec();
-  set_power_level(p);
+  //static int sched_cnt = 0;
+  temp_exec();
+  //if ((sched_cnt % 5) == 0)
+    {
+    int p = control_exec();
+    set_power_level(p);
+    }
+
+ // sched_cnt++;
 }
 

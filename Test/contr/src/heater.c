@@ -81,7 +81,11 @@ heater_exec ()
 
   if (_curr_power < 95)
     {
+#if 1
       long ms = (5000 * _curr_power) / MAX_PERCENT;
+#else
+      long ms = (5000 * 6) / MAX_PERCENT;
+#endif
       sp.tv_nsec = (ms % 1000) * 1000000L;
       sp.tv_sec = ms / 1000;
       nanosleep (&sp, &rem);
@@ -92,8 +96,8 @@ heater_exec ()
 	}
       gpio_write_val (0);
       gettimeofday(&tm2, NULL);
-      unsigned long long t = 1000 * (tm2.tv_sec - tm1.tv_sec) + (tm2.tv_usec - tm1.tv_usec) / 1000;
-     // printf("%llu ms\n", t);
+//      unsigned long long t = 1000 * (tm2.tv_sec - tm1.tv_sec) + (tm2.tv_usec - tm1.tv_usec) / 1000;
+//      printf("%llu ms\n", t);
 
     }
 
