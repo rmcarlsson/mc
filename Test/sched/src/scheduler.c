@@ -142,7 +142,7 @@ base_thread_60s (void *arg)
 
 
 int
-main (int argc, char* argv[])
+main (__attribute__((unused))int argc, __attribute__((unused))char* argv[])
 {
   pthread_t pt1;
   pthread_t pt2;
