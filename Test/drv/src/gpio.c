@@ -53,6 +53,10 @@ gpio_export (int pin)
   bytes_written = snprintf (buffer, BUFFER_MAX, "%d", pin);
   write (fd, buffer, bytes_written);
   close (fd);
+
+  /* Workaround for permission issues on GPIO */
+  sleep(1);
+
   return (0);
 }
 
@@ -73,6 +77,10 @@ gpio_unexport (int pin)
   bytes_written = snprintf (buffer, BUFFER_MAX, "%d", pin);
   write (fd, buffer, bytes_written);
   close (fd);
+
+  /* Workaround for permission issues on GPIO */
+  sleep(1);
+
   return (0);
 }
 
@@ -100,6 +108,10 @@ gpio_direction (int pin, int dir)
     }
 
   close (fd);
+
+  /* Workaround for permission issues on GPIO */
+  sleep(1);
+
   return (0);
 }
 
@@ -196,4 +208,7 @@ gpio_init()
       assert (0);
 
     }
+
+  /* Workaround for permission issues on GPIO */
+  sleep(1);
 }

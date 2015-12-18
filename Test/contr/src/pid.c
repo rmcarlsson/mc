@@ -39,7 +39,8 @@ bool inAuto;
  *    The parameters specified here are those for for which we can't set up
  *    reliable defaults, so we need to have the user set them.
  ***************************************************************************/
-void PID (double* Input, double* Output, double* Setpoint, double Kp, double Ki,
+void
+PID (double* Input, double* Output, double* Setpoint, double Kp, double Ki,
      double Kd, int ControllerDirection)
 {
 
@@ -71,36 +72,40 @@ Compute ()
 
   if (!inAuto)
     return;
-      /*Compute all the working error variables*/
-      double input = *myInput;
-      double error = *mySetpoint - input;
-      ITerm += (ki * error);
-      if (ITerm > outMax)
-	ITerm = outMax;
-      else if (ITerm < outMin)
-	ITerm = outMin;
-      double dInput = (input - lastInput);
+  /*Compute all the working error variables*/
+  double input = *myInput;
+  double error = *mySetpoint - input;
+  ITerm += (ki * error);
+  if (ITerm > outMax)
+    ITerm = outMax;
+  else if (ITerm < outMin)
+    ITerm = outMin;
+  double dInput = (input - lastInput);
 
-      /*Compute PID Output*/
-      double output = kp * error + ITerm - kd * dInput;
-      if ((fabs((kp*error) - l_p) > 2) ||
-	  (fabs(ITerm - l_i) > 1) ||
-	(fabs((kd * dInput)-l_d) > 5))
-	{
-	  printf("P=%.5lf, I=%lf, d=%lf\n", (kp*error), ITerm, (kd * dInput));
-	  l_p = (kp*error);
-	  l_i = ITerm;
-	  l_d = (kd * dInput);
-	}
+  /*Compute PID Output*/
+  double output = kp * error + ITerm - kd * dInput;
+  if ((fabs ((kp * error) - l_p) > 2) || (fabs (ITerm - l_i) > 1)
+      || (fabs ((kd * dInput) - l_d) > 5))
+    {
+//	  printf("P=%.5lf, I=%lf, d=%lf\n", (kp*error), ITerm, (kd * dInput));
+      l_p = (kp * error);
+      l_i = ITerm;
+      l_d = (kd * dInput);
+    }
 
-      if (output > outMax)
-	output = outMax;
-      else if (output < outMin)
-	output = outMin;
-      *myOutput = output;
+  if (output > outMax)
+    output = outMax;
+  else if (output < outMin)
+    output = outMin;
 
-      /*Remember some variables for next time*/
-      lastInput = input;
+  /* Always turn power off at overshoot. */
+  if (error < 0)
+    *myOutput = 0;
+
+  *myOutput = output;
+
+  /*Remember some variables for next time*/
+  lastInput = input;
 }
 
 /* SetTunings(...)*************************************************************
@@ -187,7 +192,7 @@ SetMode (int Mode)
   bool newAuto = (Mode == AUTOMATIC);
   if (newAuto == !inAuto)
     { /*we just went from manual to auto*/
-      Initialize();
+      Initialize ();
     }
   inAuto = newAuto;
 }
