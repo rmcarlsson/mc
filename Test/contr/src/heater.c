@@ -52,7 +52,7 @@ set_power_level (percent_t power_percent)
 
   if (_curr_power != last_power)
     {
-      printf ("Setting power %u\n", _curr_power);
+//      printf ("Setting power %u\n", _curr_power);
       last_power = _curr_power;
     }
 

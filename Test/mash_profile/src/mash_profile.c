@@ -52,8 +52,8 @@ typedef struct mash_profile_ta
 const mash_profile_t mp[NROF_MASH_STEPS] =
   {
     { .time = 4, .temp = 25, .name = "protein rest" },
-    { .time = 4, .temp = 28, .name = "saccharification rest" },
-    { .time = 4, .temp = 31, .name = "mashout" } };
+    { .time = 4, .temp = 29, .name = "saccharification rest" },
+    { .time = 4, .temp = 32, .name = "mash-out" } };
 
 int mash_step = 0;
 time_t step_start = 0;
@@ -64,8 +64,8 @@ handle_heating ()
   if (control_get_state () == CONTROL_STABLE)
     {
       state = MASHING;
-      printf ("Heating done, now at %d. Will stay for %d minutes",
-	      mp[mash_step].temp, mp[mash_step].time);
+      printf ("Heating done, for %s at %d C. Will stay for %d minutes.\n",
+	      mp[mash_step].name, mp[mash_step].temp, mp[mash_step].time);
     }
 }
 
@@ -83,7 +83,9 @@ handle_mashing ()
   if (step_start == 0)
     step_start = time (NULL);
 
-  if (difftime (now, step_start) >= (mp[mash_step].time * 60))
+  double diff_time = difftime (now, step_start);
+  printf("Diff time is %.1lf\n", diff_time);
+  if ( diff_time >= (double)(mp[mash_step].time * 60))
     {
       step_start = 0;
 
@@ -135,7 +137,7 @@ mash_init ()
       + mp[0].temp;
 
   printf (
-      "Heating to strike water temperature at %.1lf to hit first mash step, %s, at %d\n",
+      "Heating to strike water temperature at %.1lf C to hit first mash step, %s, at %d C\n",
       strike_water_temp, mp[0].name, mp[0].temp);
 
   control_set_target (strike_water_temp);

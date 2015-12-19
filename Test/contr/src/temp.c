@@ -82,7 +82,7 @@ get_temp()
 
   if (fabs(t_last-(t_avg/N_TAPS)) > 1)
     {
-      printf("T=%.3lf\n",(t_avg/N_TAPS) );
+      // printf("T=%.3lf\n",(t_avg/N_TAPS) );
       t_last = t_avg;
     }
 

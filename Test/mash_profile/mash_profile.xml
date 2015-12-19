@@ -1,0 +1,18 @@
+<mash_profile>
+	<step>
+		<temp>50</temp>
+		<time>20</time>
+		<name>Protein rest</name>
+	</step>
+	<step>
+		<temp>50</temp>
+		<time>20</time>
+		<name>Sacchrification rest</name>
+	</step>
+	<step>
+		<temp>74</temp>
+		<time>10</time>
+		<name>Mash-out</name>
+	</step>
+	<grainbill>1.3</grainbill>
+</mash_profile>

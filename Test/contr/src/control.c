@@ -93,6 +93,7 @@ save_pid_params (double kp, double ki, double kd)
 double i = 20;
 double o = 0;
 double setpoint = 66;
+control_state_t control_state = CONTROL_HEATING;
 
 int tuning = 0;
 
@@ -106,17 +107,9 @@ control_set_target(temperature_t t)
 control_state_t
 control_get_state()
 {
-#define ERROR_AT_STABLE (double)(1.5)
-  temperature_t curr = get_temp ();
-  double e = fabs(setpoint-curr);
-  if ( e < ERROR_AT_STABLE )
-    {
-      return CONTROL_STABLE;
-    }
-  else
-    return CONTROL_HEATING;
-
+  return control_state;
 }
+
 
 
 
@@ -173,6 +166,13 @@ control_exec ()
   else
     { //we're done, set the tuning parameters
       Compute ();
+
+#define MAX_ERR_AT_STABLE (double)(1)
+      if( fabs(setpoint-i) < MAX_ERR_AT_STABLE)
+	control_state = CONTROL_STABLE;
+      else
+	control_state = CONTROL_HEATING;
+
     }
 
   int set = 0;

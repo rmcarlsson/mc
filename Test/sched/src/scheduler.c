@@ -62,7 +62,6 @@ make_periodic (int unsigned period, struct periodic_info *info)
   if (next_sig > SIGRTMAX)
     return -1;
   info->sig = next_sig;
-  printf ("Some thread allocated RTSIG number %d\n", next_sig);
   next_sig++;
   /* Create the signal mask that will be used in wait_period */
   sigemptyset (&(info->alarm_sig));
@@ -126,12 +125,12 @@ base_thread_5s (void *arg)
 }
 
 static void *
-base_thread_60s (void *arg)
+base_thread_10s (void *arg)
 {
   (void) (arg);
   struct periodic_info info;
 
-  make_periodic (60000000, &info);
+  make_periodic (1000000, &info);
   while (1)
     {
       mash_exec();
@@ -165,7 +164,7 @@ main (__attribute__((unused))int argc, __attribute__((unused))char* argv[])
 
   pthread_create (&pt1, NULL, base_thread_1s, NULL);
   pthread_create (&pt2, NULL, base_thread_5s, NULL);
-  pthread_create (&pt3, NULL, base_thread_60s, NULL);
+  pthread_create (&pt3, NULL, base_thread_10s, NULL);
 
 
   (void)pthread_join (pt1, NULL);

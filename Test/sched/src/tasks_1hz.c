@@ -22,6 +22,8 @@ void init()
 {
 
 
+  read_profile();
+
   init_heater(100);
   control_init();
   gpio_init();
