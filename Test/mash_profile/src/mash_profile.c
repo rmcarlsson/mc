@@ -12,11 +12,12 @@
 #include <assert.h>
 
 #include "control.h"
+#include "data_logger.h"
 
 /*
  * Tw = (.41/r)(T2 - T1) + T2
  *
- * r = 6 [kg water] / 1.3 [kg grains] = 4.6
+ * r = 4 [kg water] / 1.3 [kg grains] = 2.8
  *
  * thermodynamic constant = 0.41
  *
@@ -50,9 +51,9 @@ typedef struct mash_profile_ta
 #define NROF_MASH_STEPS (3)
 const mash_profile_t mp[NROF_MASH_STEPS] =
   {
-    { .time = 20, .temp = 55, .name = "protein rest" },
-    { .time = 60, .temp = 63, .name = "saccharification rest" },
-    { .time = 15, .temp = 75, .name = "mashout" } };
+    { .time = 4, .temp = 25, .name = "protein rest" },
+    { .time = 4, .temp = 28, .name = "saccharification rest" },
+    { .time = 4, .temp = 31, .name = "mashout" } };
 
 int mash_step = 0;
 time_t step_start = 0;
@@ -91,6 +92,7 @@ handle_mashing ()
 	{
 	  state = DONE;
 	  printf ("Mash done\n");
+	  da_dump();
 	  control_set_target (0);
 	}
       else

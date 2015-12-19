@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "pid.h"
+#include "data_logger.h"
 
 void
 Initialize ();
@@ -98,11 +99,8 @@ Compute ()
   else if (output < outMin)
     output = outMin;
 
-  /* Always turn power off at overshoot. */
-  if (error < 0)
-    *myOutput = 0;
-
   *myOutput = output;
+  da_log_val (input, output);
 
   /*Remember some variables for next time*/
   lastInput = input;

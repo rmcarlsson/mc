@@ -12,6 +12,7 @@
 #include "control.h"
 #include "heater.h"
 #include "mash_profile.h"
+#include "data_logger.h"
 
 
 
@@ -25,6 +26,7 @@ void init()
   control_init();
   gpio_init();
   mash_init();
+  da_init();
 
 }
 
