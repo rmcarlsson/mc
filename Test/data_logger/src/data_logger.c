@@ -52,15 +52,20 @@ da_dump ()
 {
   int ix = 0;
   int fd = 0;
+  mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
 
 #define MAX_LOG_LEN 1000
   char buf[MAX_LOG_LEN];
+  char header[] = "power, temperature\n";
   time_t t = time (NULL);
   struct tm tm = *localtime (&t);
 
-  snprintf (buf, MAX_LOG_LEN, "%d-%d-%d %d:%d:%d", tm.tm_year + 1900,
+  snprintf (buf, MAX_LOG_LEN, "%d-%d-%d_%d%d%d.csv", tm.tm_year + 1900,
 	    tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
-  fd = open (buf, O_RDWR | O_TRUNC, (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP));
+
+  fd = open (buf, O_RDWR|O_CREAT, mode);
+
+  write (fd, header, strlen (header));
 
   for (ix = 0; ix <= log_ix; ix++)
     {
@@ -68,4 +73,5 @@ da_dump ()
 		log_buf_p[ix].temp);
       write (fd, buf, strlen (buf));
     }
+  close (fd);
 }

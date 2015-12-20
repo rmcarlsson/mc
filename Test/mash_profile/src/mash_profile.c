@@ -9,10 +9,12 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>
+#include <string.h>
 #include <assert.h>
 
 #include "control.h"
 #include "data_logger.h"
+#include "mash_profile.h"
 
 /*
  * Tw = (.41/r)(T2 - T1) + T2
@@ -39,23 +41,22 @@ enum state_t
   INIT, WAIT_FOR_GRAINS, MASHING, HEATING, DONE
 };
 
-#define MAX_LEN_STEP_NAME (256)
-typedef struct mash_profile_ta
-{
-  uint16_t time;
-  uint16_t temp;
-  char name[MAX_LEN_STEP_NAME];
 
-} mash_profile_t;
 
+
+#if 0
 #define NROF_MASH_STEPS (3)
 const mash_profile_t mp[NROF_MASH_STEPS] =
   {
     { .time = 4, .temp = 25, .name = "protein rest" },
     { .time = 4, .temp = 29, .name = "saccharification rest" },
     { .time = 4, .temp = 32, .name = "mash-out" } };
+#else
+mash_profile_t mp[MAX_MASH_STEPS];
+#endif
 
 int mash_step = 0;
+int nrof_mash_steps = 10;
 time_t step_start = 0;
 
 void
@@ -64,7 +65,7 @@ handle_heating ()
   if (control_get_state () == CONTROL_STABLE)
     {
       state = MASHING;
-      printf ("Heating done, for %s at %d C. Will stay for %d minutes.\n",
+      printf ("Heating done, for %s at %.1lf C. Will stay for %.0lf minutes.\n",
 	      mp[mash_step].name, mp[mash_step].temp, mp[mash_step].time);
     }
 }
@@ -84,13 +85,12 @@ handle_mashing ()
     step_start = time (NULL);
 
   double diff_time = difftime (now, step_start);
-  printf("Diff time is %.1lf\n", diff_time);
   if ( diff_time >= (double)(mp[mash_step].time * 60))
     {
       step_start = 0;
 
       mash_step++;
-      if (mash_step >= NROF_MASH_STEPS)
+      if (mash_step >= nrof_mash_steps)
 	{
 	  state = DONE;
 	  printf ("Mash done\n");
@@ -101,7 +101,7 @@ handle_mashing ()
 	{
 	  state = HEATING;
 	  control_set_target (mp[mash_step].temp);
-	  printf ("Starting next step, %s. Heating to %d C\n",
+	  printf ("Starting next step, %s. Heating to %.1lf C\n",
 		  mp[mash_step].name, mp[mash_step].temp);
 	}
     }
@@ -111,13 +111,13 @@ void
 handle_wait_for_grains ()
 {
   char ch;
-  printf ("Strike water temperature reached, targeting first mash step at %d C. Please add grains.\n", mp[0].temp);
+  printf ("Strike water temperature reached, targeting first mash step at %.1lf C. Please add grains.\n", mp[0].temp);
   printf ("Hit any key when done.\n");
   read (STDIN_FILENO, &ch, 1);
 
   /* Reset temperature control from strike water temperature to first mash step temperature */
   control_set_target (mp[0].temp);
-  printf ("Starting first mash step, %s, at %d C\n",
+  printf ("Starting first mash step, %s, at %.lf C\n",
 	  mp[mash_step].name, mp[mash_step].temp);
   state = MASHING;
 
@@ -133,11 +133,16 @@ handle_init ()
 void
 mash_init ()
 {
+
+  memset(&mp[0],0, (sizeof(mash_profile_t) * MAX_MASH_STEPS));
+
+  read_mash_profile(&mp[0], &nrof_mash_steps);
+
   temperature_t strike_water_temp = (tdc / r) * (mp[0].temp - grain_temp)
       + mp[0].temp;
 
   printf (
-      "Heating to strike water temperature at %.1lf C to hit first mash step, %s, at %d C\n",
+      "Heating to strike water temperature at %.1lf C to hit first mash step, %s, at %.1lf C\n",
       strike_water_temp, mp[0].name, mp[0].temp);
 
   control_set_target (strike_water_temp);

@@ -16,7 +16,7 @@ typedef uint16_t percent_t;
 
 typedef int16_t power_t;
 
-typedef float temperature_t;
+typedef double temperature_t;
 
 
 #endif /* INTERFACES_REG_GLOBAL_TYPES_H_ */

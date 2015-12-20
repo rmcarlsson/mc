@@ -21,6 +21,9 @@
 
 #include <stdio.h>
 #include <libxml/xmlreader.h>
+#include <string.h>
+
+#include "mash_profile.h"
 
 
 
@@ -31,13 +34,67 @@
  * Dump information about the current node
  */
 
+
 void
-processStep (char *docname)
+parseStory (xmlDocPtr doc, xmlNodePtr cur, mash_profile_t* mp_p)
+{
+  xmlChar *key;
+  cur = cur->xmlChildrenNode;
+  while (cur != NULL)
+    {
+      if ((!xmlStrcmp (cur->name, (const xmlChar *) "temp")))
+	{
+	  key = xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
+	  (void)sscanf ((char*)key, "%lf", &(mp_p->temp));
+	  printf ("temp: %s\n", key);
+	  xmlFree (key);
+	}
+      if ((!xmlStrcmp (cur->name, (const xmlChar *) "time")))
+	{
+	  key = xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
+	  (void)sscanf ((char*)key, "%lf", &(mp_p->time));
+	  printf ("time: %s\n", key);
+	  xmlFree (key);
+	}
+      if ((!xmlStrcmp (cur->name, (const xmlChar *) "name")))
+	{
+	  key = xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
+	  strcpy(mp_p->name, (char*)key);
+	  printf ("name: %s\n", key);
+	  xmlFree (key);
+	}
+
+
+      cur = cur->next;
+
+    }
+  return;
+}
+
+void
+parseGrainbill(xmlDocPtr doc, xmlNodePtr cur)
+{
+  xmlChar *key;
+
+  if ((!xmlStrcmp (cur->name, (const xmlChar *) "grainbill")))
+	{
+	  key = xmlNodeListGetString (doc, cur, 1);
+	  printf ("grainbill: %s\n", key);
+	  xmlFree (key);
+	}
+
+}
+
+
+void
+processStep (char *docname, mash_profile_t* mp_p, int* nrof_steps_p)
 {
 
   xmlDocPtr doc;
   xmlNodePtr cur;
   doc = xmlParseFile (docname);
+  int n_steps = 0;
+
   if (doc == NULL)
     {
       fprintf (stderr, "Document not parsed successfully. \n");
@@ -66,7 +123,9 @@ processStep (char *docname)
     {
       if ((!xmlStrcmp (cur->name, (const xmlChar *) "step")))
 	{
-	  parseStory (doc, cur);
+	  parseStory (doc, cur, mp_p);
+	  mp_p++;
+	  n_steps++;
 	}
 
       if ((!xmlStrcmp (cur->name, (const xmlChar *) "grainbill")))
@@ -77,57 +136,13 @@ processStep (char *docname)
       cur = cur->next;
     }
   xmlFreeDoc (doc);
+  *nrof_steps_p = n_steps;
   return;
 }
 
 
 void
-parseStory (xmlDocPtr doc, xmlNodePtr cur)
-{
-  xmlChar *key;
-  cur = cur->xmlChildrenNode;
-  while (cur != NULL)
-    {
-      if ((!xmlStrcmp (cur->name, (const xmlChar *) "temp")))
-	{
-	  key = xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
-	  printf ("temp: %s\n", key);
-	  xmlFree (key);
-	}
-      if ((!xmlStrcmp (cur->name, (const xmlChar *) "time")))
-	{
-	  key = xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
-	  printf ("time: %s\n", key);
-	  xmlFree (key);
-	}
-      if ((!xmlStrcmp (cur->name, (const xmlChar *) "name")))
-	{
-	  key = xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
-	  printf ("name: %s\n", key);
-	  xmlFree (key);
-	}
-
-
-      cur = cur->next;
-    }
-  return;
-}
-
-void
-parseGrainbill(xmlDocPtr doc, xmlNodePtr cur)
-{
-  xmlChar *key;
-
-  if ((!xmlStrcmp (cur->name, (const xmlChar *) "grainbill")))
-	{
-	  key = xmlNodeListGetString (doc, cur, 1);
-	  printf ("grainbill: %s\n", key);
-	  xmlFree (key);
-	}
-
-}
-void
-read_profile ()
+read_mash_profile(mash_profile_t* mp_p, int* nrof_steps_p)
 {
 
   /*
@@ -137,7 +152,7 @@ read_profile ()
    */
   LIBXML_TEST_VERSION
 
-  processStep ("mash_profile.xml");
+  processStep ("mash_profile.xml", mp_p, nrof_steps_p);
 
 
   /*
