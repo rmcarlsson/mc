@@ -101,6 +101,7 @@ void
 control_set_target(temperature_t t)
 {
   setpoint = (double)(t);
+  control_state = CONTROL_HEATING;
 }
 
 
@@ -167,11 +168,9 @@ control_exec ()
     { //we're done, set the tuning parameters
       Compute ();
 
-#define MAX_ERR_AT_STABLE (double)(1)
-      if( fabs(setpoint-i) < MAX_ERR_AT_STABLE)
+      if(( control_state == CONTROL_HEATING ) && (i >= setpoint))
 	control_state = CONTROL_STABLE;
-      else
-	control_state = CONTROL_HEATING;
+
 
     }
 

@@ -99,9 +99,6 @@ Compute ()
   else if (output < outMin)
     output = outMin;
 
-  if (error < 0 )
-    output = 0;
-
   *myOutput = output;
   da_log_val (input, output);
 

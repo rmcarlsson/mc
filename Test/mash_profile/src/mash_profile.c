@@ -15,6 +15,7 @@
 #include "control.h"
 #include "data_logger.h"
 #include "mash_profile.h"
+#include "profile_reader.h"
 
 /*
  * Tw = (.41/r)(T2 - T1) + T2
@@ -41,19 +42,7 @@ enum state_t
   INIT, WAIT_FOR_GRAINS, MASHING, HEATING, DONE
 };
 
-
-
-
-#if 0
-#define NROF_MASH_STEPS (3)
-const mash_profile_t mp[NROF_MASH_STEPS] =
-  {
-    { .time = 4, .temp = 25, .name = "protein rest" },
-    { .time = 4, .temp = 29, .name = "saccharification rest" },
-    { .time = 4, .temp = 32, .name = "mash-out" } };
-#else
 mash_profile_t mp[MAX_MASH_STEPS];
-#endif
 
 int mash_step = 0;
 int nrof_mash_steps = 10;
@@ -85,7 +74,7 @@ handle_mashing ()
     step_start = time (NULL);
 
   double diff_time = difftime (now, step_start);
-  if ( diff_time >= (double)(mp[mash_step].time * 60))
+  if (diff_time >= (double) (mp[mash_step].time * 60))
     {
       step_start = 0;
 
@@ -94,7 +83,7 @@ handle_mashing ()
 	{
 	  state = DONE;
 	  printf ("Mash done\n");
-	  da_dump();
+	  da_dump ();
 	  control_set_target (0);
 	}
       else
@@ -111,14 +100,16 @@ void
 handle_wait_for_grains ()
 {
   char ch;
-  printf ("Strike water temperature reached, targeting first mash step at %.1lf C. Please add grains.\n", mp[0].temp);
+  printf (
+      "Strike water temperature reached, targeting first mash step at %.1lf C. Please add grains.\n",
+      mp[0].temp);
   printf ("Hit any key when done.\n");
   read (STDIN_FILENO, &ch, 1);
 
   /* Reset temperature control from strike water temperature to first mash step temperature */
   control_set_target (mp[0].temp);
-  printf ("Starting first mash step, %s, at %.lf C\n",
-	  mp[mash_step].name, mp[mash_step].temp);
+  printf ("Starting first mash step, %s, at %.lf C\n", mp[mash_step].name,
+	  mp[mash_step].temp);
   state = MASHING;
 
 }
@@ -134,9 +125,9 @@ void
 mash_init ()
 {
 
-  memset(&mp[0],0, (sizeof(mash_profile_t) * MAX_MASH_STEPS));
+  memset (&mp[0], 0, (sizeof(mash_profile_t) * MAX_MASH_STEPS));
 
-  read_mash_profile(&mp[0], &nrof_mash_steps);
+  read_mash_profile (&mp[0], &nrof_mash_steps);
 
   temperature_t strike_water_temp = (tdc / r) * (mp[0].temp - grain_temp)
       + mp[0].temp;
