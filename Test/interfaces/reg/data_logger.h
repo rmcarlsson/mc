@@ -9,7 +9,7 @@
 #define INTERFACES_REG_DATA_LOGGER_H_
 
 void
-da_log_val (temperature_t t, power_t p);
+da_log_val (temperature_t t_top, temperature_t t_bottom, power_t p);
 
 void
 da_init();

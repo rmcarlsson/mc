@@ -20,6 +20,7 @@
 typedef struct da_t
 {
   temperature_t temp;
+  temperature_t temp_top;
   power_t power;
 } da_t;
 
@@ -37,10 +38,11 @@ da_init ()
 }
 
 void
-da_log_val (temperature_t t, power_t p)
+da_log_val (temperature_t t_top, temperature_t t_bottom, power_t p)
 {
   log_buf_p[log_ix].power = p;
-  log_buf_p[log_ix].temp = t;
+  log_buf_p[log_ix].temp = t_bottom;
+  log_buf_p[log_ix].temp_top = t_top;
 
   if (log_ix < MAX_NROF_LOG_VALUES)
     log_ix++;

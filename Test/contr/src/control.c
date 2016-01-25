@@ -18,6 +18,7 @@
 #include "pid.h"
 #include "pid_atune.h"
 #include "temp.h"
+#include "data_logger.h"
 #include "control.h"
 
 bool get_pid_params(double* kp, double* ki, double* kd) {
@@ -137,7 +138,9 @@ void control_init() {
 
 int control_exec() {
 
-	i = get_temp();
+	temperature_t t_bottom;
+
+	get_temp(&i, &t_bottom);
 
 	if (tuning == 0) {
 		tuning = Runtime();
@@ -164,12 +167,9 @@ int control_exec() {
 
 	}
 
-	int set = 0;
-	if (o < 0)
-		set = 0;
-	else
-		set = (uint16_t) (o);
 
-	return set;
+	da_log_val (i, t_bottom, o);
+
+	return o;
 }
 

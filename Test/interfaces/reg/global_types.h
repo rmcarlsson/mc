@@ -18,5 +18,8 @@ typedef int16_t power_t;
 
 typedef double temperature_t;
 
+typedef enum {
+	OK, FAIL
+} success_t;
 
 #endif /* INTERFACES_REG_GLOBAL_TYPES_H_ */

@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "pid.h"
-#include "data_logger.h"
+
 
 void
 Initialize ();
@@ -100,7 +100,6 @@ Compute ()
     output = outMin;
 
   *myOutput = output;
-  da_log_val (input, output);
 
 
   /*Remember some variables for next time*/
